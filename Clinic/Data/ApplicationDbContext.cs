@@ -14,6 +14,19 @@ namespace Clinic.Data
 
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Specialization>().HasData(
+                new {Id=(long) 1, SpecializationName="Sp1" },
+                new {Id= (long) 2, SpecializationName="Sp2"}
+            );
+        }
+
         public DbSet<Doctor> Doctors { get; set; }
+        public DbSet<Patient> Patients { get; set; }
+        public DbSet<Appointment> Appointments { get; set; }
+        public DbSet<Specialization> Specializations { get; set; }
     }
 }

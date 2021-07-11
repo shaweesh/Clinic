@@ -4,14 +4,16 @@ using Clinic.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Clinic.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210711093928_ChangeDoctors1239")]
+    partial class ChangeDoctors1239
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -26,9 +28,6 @@ namespace Clinic.Migrations
                         .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<long?>("AppointmentTypeId")
-                        .HasColumnType("bigint");
-
                     b.Property<long>("DoctorId")
                         .HasColumnType("bigint");
 
@@ -40,29 +39,11 @@ namespace Clinic.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppointmentTypeId");
-
                     b.HasIndex("DoctorId");
 
                     b.HasIndex("PatientId");
 
                     b.ToTable("Appointments");
-                });
-
-            modelBuilder.Entity("Clinic.Models.AppointmentType", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Type")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AppointmentType");
                 });
 
             modelBuilder.Entity("Clinic.Models.Doctor", b =>
@@ -99,35 +80,9 @@ namespace Clinic.Migrations
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("SpecializationId")
-                        .HasColumnType("bigint");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("SpecializationId");
 
                     b.ToTable("Doctors");
-                });
-
-            modelBuilder.Entity("Clinic.Models.MedicalHistory", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<long>("PatientId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PatientId");
-
-                    b.ToTable("MedicalHistory");
                 });
 
             modelBuilder.Entity("Clinic.Models.Patient", b =>
@@ -172,40 +127,8 @@ namespace Clinic.Migrations
                     b.ToTable("Patients");
                 });
 
-            modelBuilder.Entity("Clinic.Models.Specialization", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("SpecializationName")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Specializations");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1L,
-                            SpecializationName = "Sp1"
-                        },
-                        new
-                        {
-                            Id = 2L,
-                            SpecializationName = "Sp2"
-                        });
-                });
-
             modelBuilder.Entity("Clinic.Models.Appointment", b =>
                 {
-                    b.HasOne("Clinic.Models.AppointmentType", "AppointmentType")
-                        .WithMany()
-                        .HasForeignKey("AppointmentTypeId");
-
                     b.HasOne("Clinic.Models.Doctor", "Doctor")
                         .WithMany("Appointments")
                         .HasForeignKey("DoctorId")
@@ -218,31 +141,7 @@ namespace Clinic.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("AppointmentType");
-
                     b.Navigation("Doctor");
-
-                    b.Navigation("Patient");
-                });
-
-            modelBuilder.Entity("Clinic.Models.Doctor", b =>
-                {
-                    b.HasOne("Clinic.Models.Specialization", "Specialization")
-                        .WithMany()
-                        .HasForeignKey("SpecializationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Specialization");
-                });
-
-            modelBuilder.Entity("Clinic.Models.MedicalHistory", b =>
-                {
-                    b.HasOne("Clinic.Models.Patient", "Patient")
-                        .WithMany("MedicalHistories")
-                        .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.Navigation("Patient");
                 });
@@ -255,8 +154,6 @@ namespace Clinic.Migrations
             modelBuilder.Entity("Clinic.Models.Patient", b =>
                 {
                     b.Navigation("Appointments");
-
-                    b.Navigation("MedicalHistories");
                 });
 #pragma warning restore 612, 618
         }
