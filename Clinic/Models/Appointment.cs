@@ -22,6 +22,8 @@ namespace Clinic.Models
         public Patient Patient { get; set; }
         [DataType(DataType.DateTime)]
         public DateTime Reservation { get; set; }
+        public long AppointmentId { get; set; }
+        [ForeignKey("AppointmentId")]
         public AppointmentType AppointmentType { get; set; }
     }
 }
