@@ -12,6 +12,7 @@ namespace Clinic.Models
         [Required]
         public long Id { get; set; }
         [StringLength(50, ErrorMessage = "Maximum length is {1}")]
+        [Display(Name = "Specialization Name")]
         public string SpecializationName { get; set; }
     }
 }

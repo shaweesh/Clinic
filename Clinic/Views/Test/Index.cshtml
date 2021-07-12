@@ -1,0 +1,20 @@
+﻿@model IEnumerable<Specialization>
+<div class="container">
+    <a asp-action="Create"><strong>Create new</strong></a>
+    @foreach (var item in Model)
+    {
+        <div class="row">
+            <div class="col">
+                @item.Id
+            </div>
+            <div class="col">
+
+                @item.SpecializationName
+            </div>
+            <div class="col">
+                <a asp-action="Detail" asp-route-id="@item.Id">Detail</a>
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </div>
+        </div>
+    }
+</div>
