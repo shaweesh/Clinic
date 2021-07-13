@@ -1,8 +1,53 @@
-﻿@{
+﻿@model IEnumerable<Clinic.Models.Appointment>
+
+@{
     ViewData["Title"] = "Home Page";
 }
-
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@if (!Model.Any())
+{
+    <h3>No Appointments</h3>
+}
+else {
+<table class="table">
+    <thead>
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Doctor)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Patient)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Reservation)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.AppointmentType.Type)
+        </th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Doctor.DoctorName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Patient.PatientName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Reservation)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AppointmentType.Type)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-controller="Appointments" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-controller="Appointments" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-controller="Appointments" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+}

@@ -6,21 +6,25 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Clinic.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Clinic.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
+        private readonly ApplicationDbContext _context;
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
         {
             _logger = logger;
+            _context = context;
         }
 
         public IActionResult Index()
         {
-            return View();
+            var applicationDbContext = _context.Appointments.Include(a => a.AppointmentType).Include(a => a.Doctor).Include(a => a.Patient).Where(a=> a.Reservation.Date == DateTime.Today.Date).OrderBy(a=>a.Reservation);
+            return View(applicationDbContext.ToList());
         }
 
         public IActionResult Privacy()
