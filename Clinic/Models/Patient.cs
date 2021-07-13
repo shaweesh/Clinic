@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -33,5 +34,11 @@ namespace Clinic.Models
         public string SSN { get; set; }
         public List<Appointment> Appointments { get; set; }
         public List<MedicalHistory> MedicalHistories { get; set; }
+        [NotMapped]
+        public string PatientName
+        {
+            get { return $"{FirstName} {LastName}"; }
+
+        }
     }
 }

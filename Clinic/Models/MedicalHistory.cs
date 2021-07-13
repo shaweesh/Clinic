@@ -14,6 +14,7 @@ namespace Clinic.Models
         public long Id { get; set; }
         [StringLength(50, ErrorMessage = "Maximum length is {1}")]
         public string Description { get; set; }
+        [Display(Name = "Patient")]
         public long PatientId { get; set; }
         [ForeignKey("PatientId")]
         public Patient Patient { get; set; }

@@ -20,7 +20,7 @@ namespace Clinic.Models
         [StringLength(50, ErrorMessage = "Maximum length is {1}")]
         [RegularExpression("^[A-Za-z]+$")]
         public string LastName { get; set; }
-
+        
         [StringLength(100, ErrorMessage = "Maximum length is {1}")]
         public string Address { get; set; }
 
@@ -37,8 +37,15 @@ namespace Clinic.Models
         public string Email { get; set; }
         public IList<Appointment> Appointments { get; set; }
         [Required]
+        [Display(Name = "Specialization")]
         public long SpecializationId { get; set; }
         [ForeignKey("SpecializationId")]
         public Specialization Specialization { get; set; }
+        [NotMapped]
+        public string DoctorName
+        {
+            get { return $"{FirstName} {LastName}"; }
+
+        }
     }
 }
