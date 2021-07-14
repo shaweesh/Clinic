@@ -44,7 +44,10 @@ namespace Clinic.Models
         [NotMapped]
         public string DoctorName
         {
-            get { return $"{FirstName} {LastName}"; }
+            get
+            {
+                return $"{FirstName} {LastName}";
+            }
 
         }
     }

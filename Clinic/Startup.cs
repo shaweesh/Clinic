@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Clinic.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 namespace Clinic
 {
@@ -27,6 +28,15 @@ namespace Clinic
             var connString = Configuration.GetConnectionString("Default");
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connString));
             services.AddControllersWithViews();
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "My Awesome API",
+                    Version = "v1"
+                });
+            });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -34,6 +44,11 @@ namespace Clinic
         {
             if (env.IsDevelopment())
             {
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My Awesome API V1");
+                });
                 app.UseDeveloperExceptionPage();
             }
             else
