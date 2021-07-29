@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Clinic.Data;
+using Clinic.Helper;
 using Clinic.Models;
+using Newtonsoft.Json;
 
 namespace Clinic.Controllers
 {
@@ -18,12 +22,62 @@ namespace Clinic.Controllers
         {
             _context = context;
         }
+        private List<Doctor> SortData(List<Doctor> doctors, string sortField, string currentSortField, string currentSortOrder)
+        {
+            if (string.IsNullOrEmpty(sortField))
+            {
+                ViewBag.SortField = "FirstName";
+                ViewBag.SortOrder = "Asc";
+            }
+            else
+            {
+                if (currentSortField == sortField)
+                {
+                    ViewBag.SortOrder = currentSortOrder == "Asc" ? "Desc" : "Asc";
+                }
+                else
+                {
+                    ViewBag.SortOrder = "Asc";
+                }
+                ViewBag.SortField = sortField;
+            }
+
+            var propertyInfo = typeof(Doctor).GetProperty(ViewBag.SortField);
+            if (ViewBag.SortOrder == "Asc")
+            {
+                doctors = doctors.OrderBy(s => propertyInfo.GetValue(s, null)).ToList();
+            }
+            else
+            {
+                doctors = doctors.OrderByDescending(s => propertyInfo.GetValue(s, null)).ToList();
+            }
+            return doctors;
+        }
 
         // GET: Doctors
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortField, string currentSortField, string currentSortOrder, string currentFilter, string SearchString,
+            int? pageNo)
         {
-            var applicationDbContext = _context.Doctors.Include(d => d.Specialization);
-            return View(await applicationDbContext.ToListAsync());
+            var applicationDbContext = await _context.Doctors.Include(d => d.Specialization).ToListAsync();
+
+            if (SearchString != null)
+            {
+                pageNo = 1;
+            }
+            else
+            {
+                SearchString = currentFilter;
+            }
+            ViewData["CurrentSort"] = sortField;
+            ViewBag.CurrentFilter = SearchString;
+            if (!String.IsNullOrEmpty(SearchString))
+            {
+                applicationDbContext = applicationDbContext.Where(s => s.FirstName.Contains(SearchString) || s.LastName.Contains(SearchString)).ToList();
+            }
+
+            applicationDbContext = this.SortData(applicationDbContext, sortField, currentSortField, currentSortOrder);
+            int pageSize = 10;
+            return View(PagingList<Doctor>.CreateAsync(applicationDbContext.AsQueryable<Doctor>(), pageNo ?? 1, pageSize));
         }
 
         // GET: Doctors/Details/5
@@ -44,11 +98,37 @@ namespace Clinic.Controllers
 
             return View(doctor);
         }
+        private async Task<IEnumerable<CountryModel>> GetCoutries()
+        {
+            string Baseurl = "https://restcountries.eu/rest/v2/all";
 
+            List<CountryModel> country = new List<CountryModel>();
+
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(Baseurl);
+
+                client.DefaultRequestHeaders.Clear();
+                //Define request data format  
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                HttpResponseMessage Res = await client.GetAsync(Baseurl);
+
+                if (Res.IsSuccessStatusCode)
+                {
+                    var CountryResponse = Res.Content.ReadAsStringAsync().Result;
+                    country = JsonConvert.DeserializeObject<List<CountryModel>>(CountryResponse);
+
+
+                }
+            }
+
+            return country;
+        }
         // GET: Doctors/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             ViewData["SpecializationId"] = new SelectList(_context.Specializations, "Id", "SpecializationName");
+            ViewData["Country"] = new SelectList(await this.GetCoutries(), "Name", "Name");
             return View();
         }
 
@@ -57,7 +137,7 @@ namespace Clinic.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,FirstName,LastName,Address,Notes,MonthlySalary,PhoneNumber,IBAN,Email,SpecializationId")] Doctor doctor)
+        public async Task<IActionResult> Create(Doctor doctor)
         {
             if (ModelState.IsValid)
             {
@@ -83,6 +163,7 @@ namespace Clinic.Controllers
                 return NotFound();
             }
             ViewData["SpecializationId"] = new SelectList(_context.Specializations, "Id", "SpecializationName", doctor.SpecializationId);
+            ViewData["Country"] = new SelectList(await this.GetCoutries(), "Name", "Name", doctor.Country);
             return View(doctor);
         }
 
@@ -91,7 +172,7 @@ namespace Clinic.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long id, [Bind("Id,FirstName,LastName,Address,Notes,MonthlySalary,PhoneNumber,IBAN,Email,SpecializationId")] Doctor doctor)
+        public async Task<IActionResult> Edit(long id, Doctor doctor)
         {
             if (id != doctor.Id)
             {

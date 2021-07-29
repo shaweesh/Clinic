@@ -40,5 +40,8 @@ namespace Clinic.Models
             get { return $"{FirstName} {LastName}"; }
 
         }
+        public string Country { get; set; }
+
+    
     }
 }

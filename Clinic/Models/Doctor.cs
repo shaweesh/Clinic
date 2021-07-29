@@ -50,5 +50,6 @@ namespace Clinic.Models
             }
 
         }
+        public string Country { get; set; }
     }
 }
